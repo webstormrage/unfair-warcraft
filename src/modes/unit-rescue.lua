@@ -1,0 +1,57 @@
+function safeUnit(unit)
+    SetUnitX(TELEPORTER_SINGLETON, GetUnitX(unit))
+    SetUnitY(TELEPORTER_SINGLETON, GetUnitY(unit))
+    SetUnitOwner(TELEPORTER_SINGLETON, GetOwningPlayer(unit), false)
+    local saved = CreateUnit(GetOwningPlayer(unit), GetUnitTypeId(unit), GetUnitX(unit), GetUnitY(unit), 225)
+    UnitResetCooldown(TELEPORTER_SINGLETON)
+    SetUnitLifePercentBJ(saved, 1)
+    SetUnitManaPercentBJ(saved, 1)
+    UnitUseItemTarget(TELEPORTER_SINGLETON, UnitItemInSlot(TELEPORTER_SINGLETON, 0), saved)
+    TriggerSleepAction(0.3)
+    SetUnitOwner(TELEPORTER_SINGLETON, AI_PLAYER, false)
+    SetUnitX(TELEPORTER_SINGLETON, 0)
+    SetUnitY(TELEPORTER_SINGLETON, 0)
+end
+
+function unitRescueMain()
+    local x = 0
+    local y = 0
+    TELEPORTER_SINGLETON = CreateUnit(AI_PLAYER, rawCode2Id('Hant'), x, y, 225)
+    local staff = CreateItem(rawCode2Id('ssan'), x, y)
+    SetItemDroppable(staff, false)
+    UnitAddItem(TELEPORTER_SINGLETON, staff)
+    SetUnitInvulnerable(TELEPORTER_SINGLETON, true)
+    SuspendHeroXP(TELEPORTER_SINGLETON, true)
+    UnitRemoveAbilityBJ(rawCode2Id('Aatk'), TELEPORTER_SINGLETON)
+    SetUnitPathing(TELEPORTER_SINGLETON, false)
+    ShowUnit(TELEPORTER_SINGLETON, false)
+
+    local safeTrigger = CreateTrigger()
+    TriggerRegisterAnyUnitEventBJ(safeTrigger, EVENT_PLAYER_UNIT_DEATH)
+    TriggerAddAction(safeTrigger, function ()
+        local dead = GetDyingUnit()
+        local killer = GetKillingUnit()
+        if not IsUnitType(dead, UNIT_TYPE_SUMMONED) and
+           not IsUnitType(dead, UNIT_TYPE_STRUCTURE) and
+           not IsUnitType(dead, UNIT_TYPE_HERO) and
+           GetOwningPlayer(dead) == BUFFED_PLAYER and
+           GetOwningPlayer(killer) ~= BUFFED_PLAYER then
+            safeUnit(dead)
+        end
+    end)
+    DisableTrigger(safeTrigger)
+
+    local controlTrigger = CreateTrigger()
+    TriggerRegisterPlayerChatEvent(controlTrigger, ADMIN_PLAYER, 'rescue', false)
+    TriggerAddAction(controlTrigger, function ()
+        local command = GetEventPlayerChatString()
+        if string.find(command, '+rescue') then
+            EnableTrigger(safeTrigger)
+            print('Unit rescue mode enabled')
+        end
+        if string.find(command, '-rescue') then
+            DisableTrigger(safeTrigger)
+            print('Unit rescue mode disabled')
+        end
+    end)
+end
