@@ -3,6 +3,7 @@
 Lua script for unfair warcraft. Inspired by [Болькрафт](https://www.youtube.com/playlist?list=PLZT7fvvYlYfhqWJBWzJoLQxconfz1lHPq).
 
 ## Modes
+Modes are buffs for Buffed Player (default Player 2), or debuffs for Enemies of Buffed Player.
 
 ### Epic drop
 Buffed player has a chance to get epic item or 1-6 books for hero stats from killing neutrals
@@ -68,5 +69,3 @@ turns off Neutral attack
 ```
 unfairWarcraftMain()
 ```
-
-## Customization
