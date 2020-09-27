@@ -3,6 +3,7 @@ function unfairWarcraftMain()
     ADMIN_PLAYER = Player(0)
     AI_PLAYER = Player(23)
     SetPlayerAllianceStateAllyBJ(BUFFED_PLAYER, AI_PLAYER, true)
+    SetPlayerAllianceStateAllyBJ(AI_PLAYER, BUFFED_PLAYER, true)
 
     epicDropMain()
     hellRainMain()
@@ -10,7 +11,5 @@ function unfairWarcraftMain()
     unitRescueMain()
     unitTrainMain()
     walkingDeadMain()
-    if GetLocalPlayer() == ADMIN_PLAYER then
-        frameMain()
-    end
+    frameMain()
 end

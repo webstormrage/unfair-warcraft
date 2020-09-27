@@ -5,6 +5,10 @@ function renderToggleButton(onClick)
     BlzFrameSetPoint(button, FRAMEPOINT_TOPLEFT, mainFrame, FRAMEPOINT_TOPLEFT, 0, -0.025)
     BlzFrameSetText(button, '-')
 
+    if GetLocalPlayer() ~= ADMIN_PLAYER then
+        BlzFrameSetVisible(button, false)
+    end
+    
     local trigger = CreateTrigger()
     
     TriggerAddAction(trigger, onClick)
@@ -32,7 +36,7 @@ function renderModeToggler(trigger, name, iconSrc, x, y)
             print(name..' mode enabled')
         end
     end)
-
+    
     BlzTriggerRegisterFrameEvent(controlTrigger, button, FRAMEEVENT_CONTROL_CLICK)
     return button
 end    
@@ -83,6 +87,9 @@ function frameMain()
                      unitRescueButton, unitTrainButton, walkingDeadButton }    
 
     local toggleButton = renderToggleButton(function()
+        if GetLocalPlayer() ~= ADMIN_PLAYER then
+            return
+        end
         for i, btn in ipairs(buttons) do
             BlzFrameSetVisible(btn, not BlzFrameIsVisible(btn))
         end
