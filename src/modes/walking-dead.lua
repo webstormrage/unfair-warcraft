@@ -11,9 +11,9 @@ end
 
 
 function walkingDeadMain()
-    local waveTrigger = CreateTrigger()
-    TriggerRegisterAnyUnitEventBJ(waveTrigger, EVENT_PLAYER_UNIT_DEATH)
-    TriggerAddAction(waveTrigger, function ()
+    WalkingDeadTrigger = CreateTrigger()
+    TriggerRegisterAnyUnitEventBJ(WalkingDeadTrigger, EVENT_PLAYER_UNIT_DEATH)
+    TriggerAddAction(WalkingDeadTrigger, function ()
         local unit = GetDyingUnit()
         local owner = GetOwningPlayer(unit)
         local killer = GetKillingUnit()
@@ -27,19 +27,5 @@ function walkingDeadMain()
             spawnWalkingDead(unit, owner)
         end
     end)
-    DisableTrigger(waveTrigger)
-
-    local controlTrigger =  CreateTrigger()
-    TriggerRegisterPlayerChatEvent(controlTrigger, ADMIN_PLAYER, 'revenge', false)
-    TriggerAddAction(controlTrigger, function()
-        local command = GetEventPlayerChatString()
-        if string.find(command, '+revenge') then
-            EnableTrigger(waveTrigger)
-            print('Walking dead mode enabled')
-        end
-        if string.find(command, '-revenge') then
-            DisableTrigger(waveTrigger)
-            print('Walking dead mode disabled')
-        end
-    end)
+    DisableTrigger(WalkingDeadTrigger)
 end

@@ -4,11 +4,13 @@ function unfairWarcraftMain()
     AI_PLAYER = Player(23)
     SetPlayerAllianceStateAllyBJ(BUFFED_PLAYER, AI_PLAYER, true)
 
-    summonArchimondeMain()
     epicDropMain()
     hellRainMain()
     neutralWaveMain()
     unitRescueMain()
     unitTrainMain()
     walkingDeadMain()
+    if GetLocalPlayer() == ADMIN_PLAYER then
+        frameMain()
+    end
 end

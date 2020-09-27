@@ -5,9 +5,9 @@ function spawnNeutralWave(unitTypeId)
 end
 
 function neutralWaveMain()
-   local waveTrigger = CreateTrigger()
-   TriggerRegisterAnyUnitEventBJ(waveTrigger, EVENT_PLAYER_UNIT_DEATH)
-   TriggerAddAction(waveTrigger, function ()
+   WaveTrigger = CreateTrigger()
+   TriggerRegisterAnyUnitEventBJ(WaveTrigger, EVENT_PLAYER_UNIT_DEATH)
+   TriggerAddAction(WaveTrigger, function ()
        local diedUnit = GetDyingUnit()
        local killingUnit = GetKillingUnit()
        if GetOwningPlayer(killingUnit) == BUFFED_PLAYER and
@@ -15,19 +15,5 @@ function neutralWaveMain()
           spawnNeutralWave(GetUnitTypeId(diedUnit))
         end
    end)
-   DisableTrigger(waveTrigger)
-
-   local controlTrigger = CreateTrigger()
-   TriggerRegisterPlayerChatEvent(controlTrigger, ADMIN_PLAYER, 'rush', false) 
-   TriggerAddAction(controlTrigger, function ()
-      local command = GetEventPlayerChatString()
-      if string.find(command,'+rush') then
-         EnableTrigger(waveTrigger)
-         print('Neutral waves mode enabled')
-      end
-      if string.find(command,'-rush') then
-         DisableTrigger(waveTrigger)
-         print('Neutral waves mode disabled')
-      end
-   end)
+   DisableTrigger(WaveTrigger)
 end

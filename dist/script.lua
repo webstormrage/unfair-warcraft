@@ -1,62 +1,93 @@
-function getPlayerPosition(player)
-    local structures = GetUnitsOfPlayerMatching(player, Filter(function ()
-        return IsUnitType(GetFilterUnit(), UNIT_TYPE_STRUCTURE)
-    end))
-    local target = GroupPickRandomUnit(structures)
-    return GetUnitX(target), GetUnitY(target)
-end
+function renderToggleButton(onClick)
+    local mainFrame = BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0)
+    local button = BlzCreateFrame('ReplayButton', mainFrame, 0, 0)
+    BlzFrameSetSize(button, 0.02, 0.02)
+    BlzFrameSetPoint(button, FRAMEPOINT_TOPLEFT, mainFrame, FRAMEPOINT_TOPLEFT, 0, -0.025)
+    BlzFrameSetText(button, '-')
 
-function getRandomEnemy(player)
-    local enemies = GetPlayersEnemies(player)
-    return ForcePickRandomPlayer(enemies)
-end
-
-function rawCode2Id(rawCode)
-    local length = string.len(rawCode)
-    local i = 0
-    local mul = 1
-    local id = 0
-    local byte
-    repeat
-        byte = string.byte(rawCode, length - i)
-        id = id + byte * mul
-        i = i + 1
-        mul = mul * 256
-    until i == length
-    return id
-end
-
-
-function summonArchimonde()
-    RemoveUnit(ARCHIMONDE_SINGLETON)
-    local camera = GetCurrentCameraSetup()
-    local x = GetCameraTargetPositionX(camera)
-    local y = GetCameraTargetPositionY(camera)
-    local archimondeId = rawCode2Id('Uwar')
-    ARCHIMONDE_SINGLETON = CreateUnit(AI_PLAYER, archimondeId, x, y, 225)
-    SetHeroLevelBJ(ARCHIMONDE_SINGLETON, 10, false)
-    -- TODO: add summon Dark ritual special effect 1.5sec
-end
-
-function despawnArchimonde()
-    RemoveUnit(ARCHIMONDE_SINGLETON)
-    -- TODO: add summon Dark ritual special effect 1.5sec
-end
-
-function summonArchimondeMain()
     local trigger = CreateTrigger()
-    TriggerRegisterPlayerChatEvent(trigger, ADMIN_PLAYER, 'archimonde', false) 
-    TriggerAddAction(trigger, function ()
-        local command = GetEventPlayerChatString()
-        if string.find(command,'+archimonde') then
-            summonArchimonde()
-            print('Archimonde has been spawned')
-        end
-        if string.find(command,'-archimonde') then
-            despawnArchimonde()
-            print('Archimonde has been despawned')
+    
+    TriggerAddAction(trigger, onClick)
+
+    BlzTriggerRegisterFrameEvent(trigger, button, FRAMEEVENT_CONTROL_CLICK)
+end
+
+function renderModeToggler(trigger, name, iconSrc, x, y)
+    local mainFrame = BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0)
+    local button = BlzCreateFrame('ScoreScreenBottomButtonTemplate', mainFrame, 0, 0)
+    local icon = BlzGetFrameByName('ScoreScreenButtonBackdrop', 0)
+    BlzFrameSetTexture(icon, iconSrc, 0, true)
+    BlzFrameSetSize(button, 0.04, 0.04)
+    BlzFrameSetPoint(button, FRAMEPOINT_TOPLEFT, mainFrame, FRAMEPOINT_TOPLEFT, x, y)
+    BlzFrameSetVisible(button, false)
+
+    local controlTrigger = CreateTrigger()
+    
+    TriggerAddAction(controlTrigger, function()
+        if IsTriggerEnabled(trigger) then
+            DisableTrigger(trigger)
+            print(name..' mode disabled')
+        else
+            EnableTrigger(trigger)
+            print(name..' mode enabled')
         end
     end)
+
+    BlzTriggerRegisterFrameEvent(controlTrigger, button, FRAMEEVENT_CONTROL_CLICK)
+    return button
+end    
+
+
+function frameMain()
+    local hellRainButton = renderModeToggler(
+        HellRainTrigger,
+        'Infernal',
+        'ReplaceableTextures\\CommandButtons\\BTNInfernal.blp',
+        0, -0.055)
+
+    local epicDropButton = renderModeToggler(
+        DropTrigger,
+        'Epic drop',
+        'ReplaceableTextures//CommandButtons//BTNTomeBrown.blp',
+        0.05, -0.055)
+
+    local neutralAttackButton = renderModeToggler(
+        WaveTrigger,
+        'Neutral waves',
+        'ReplaceableTextures\\CommandButtons\\BTNGnollWarden.blp',
+        0.1, -0.055
+    ) 
+    
+    local unitRescueButton = renderModeToggler(
+        SafeTrigger,
+        'Unit rescue',
+        'ReplaceableTextures\\CommandButtons\\BTNStaffOfSanctuary.blp',
+        0, -0.105
+    )
+
+    local unitTrainButton = renderModeToggler(
+        UnitBuffTrigger,
+        'Training units',
+        'ReplaceableTextures\\CommandButtons\\BTNOrcMeleeUpThree.blp',
+        0.05, -0.105
+    )
+
+    local walkingDeadButton = renderModeToggler(
+        WalkingDeadTrigger,
+        'Walking dead',
+        'ReplaceableTextures\\CommandButtons\\BTNAnimateDead.blp',
+        0.1, -0.105
+    )
+
+    local buttons = {hellRainButton, epicDropButton, neutralAttackButton,
+                     unitRescueButton, unitTrainButton, walkingDeadButton }    
+
+    local toggleButton = renderToggleButton(function()
+        for i, btn in ipairs(buttons) do
+            BlzFrameSetVisible(btn, not BlzFrameIsVisible(btn))
+        end
+    end)
+
 end
 
 function dropItem(itemRawCode, rate, x, y)
@@ -99,9 +130,9 @@ function createEpicDrop(x, y)
 end
 
 function epicDropMain()
-    local dropTrigger = CreateTrigger()
-    TriggerRegisterAnyUnitEventBJ(dropTrigger, EVENT_PLAYER_UNIT_DEATH)
-    TriggerAddAction(dropTrigger, function ()
+    DropTrigger = CreateTrigger()
+    TriggerRegisterAnyUnitEventBJ(DropTrigger, EVENT_PLAYER_UNIT_DEATH)
+    TriggerAddAction(DropTrigger, function ()
         local dead = GetDyingUnit()
         local killer = GetKillingUnit()
         if GetOwningPlayer(dead) == Player(PLAYER_NEUTRAL_AGGRESSIVE) and
@@ -109,21 +140,7 @@ function epicDropMain()
            createEpicDrop(GetUnitX(dead), GetUnitY(dead))
         end
     end)
-    DisableTrigger(dropTrigger)
-
-    local controlTrigger = CreateTrigger()
-    TriggerRegisterPlayerChatEvent(controlTrigger, ADMIN_PLAYER, 'drop', false)
-    TriggerAddAction(controlTrigger, function ()
-        local command = GetEventPlayerChatString()
-        if string.find(command,'+drop') then
-            EnableTrigger(dropTrigger)
-            print('Epic drop mode enabled')
-        end
-        if string.find(command,'-drop') then
-            DisableTrigger(dropTrigger)
-            print('Epic drop mode disabled')
-        end
-    end)
+    DisableTrigger(DropTrigger)
 end
 
 function spawnDreadLord()
@@ -155,24 +172,10 @@ function spawnDreadLord()
 end
 
 function hellRainMain()
-    local hellRainTrigger = CreateTrigger()
-    TriggerRegisterTimerEventPeriodic(hellRainTrigger, 120)
-    TriggerAddAction(hellRainTrigger, spawnDreadLord)
-    DisableTrigger(hellRainTrigger)
-
-    local controlTrigger = CreateTrigger()
-    TriggerRegisterPlayerChatEvent(controlTrigger, ADMIN_PLAYER, 'inferno', false)
-    TriggerAddAction(controlTrigger, function()
-        local command = GetEventPlayerChatString()
-        if string.find(command, '+inferno') then
-            EnableTrigger(hellRainTrigger)
-            print('Infernal mode enabled')
-        end
-        if string.find(command, '-inferno') then
-            DisableTrigger(hellRainTrigger)
-            print('Infernal mode disabled')
-        end
-    end)
+    HellRainTrigger = CreateTrigger()
+    TriggerRegisterTimerEventPeriodic(HellRainTrigger, 120)
+    TriggerAddAction(HellRainTrigger, spawnDreadLord)
+    DisableTrigger(HellRainTrigger)
 end
 
 function spawnNeutralWave(unitTypeId)
@@ -182,9 +185,9 @@ function spawnNeutralWave(unitTypeId)
 end
 
 function neutralWaveMain()
-   local waveTrigger = CreateTrigger()
-   TriggerRegisterAnyUnitEventBJ(waveTrigger, EVENT_PLAYER_UNIT_DEATH)
-   TriggerAddAction(waveTrigger, function ()
+   WaveTrigger = CreateTrigger()
+   TriggerRegisterAnyUnitEventBJ(WaveTrigger, EVENT_PLAYER_UNIT_DEATH)
+   TriggerAddAction(WaveTrigger, function ()
        local diedUnit = GetDyingUnit()
        local killingUnit = GetKillingUnit()
        if GetOwningPlayer(killingUnit) == BUFFED_PLAYER and
@@ -192,21 +195,7 @@ function neutralWaveMain()
           spawnNeutralWave(GetUnitTypeId(diedUnit))
         end
    end)
-   DisableTrigger(waveTrigger)
-
-   local controlTrigger = CreateTrigger()
-   TriggerRegisterPlayerChatEvent(controlTrigger, ADMIN_PLAYER, 'rush', false) 
-   TriggerAddAction(controlTrigger, function ()
-      local command = GetEventPlayerChatString()
-      if string.find(command,'+rush') then
-         EnableTrigger(waveTrigger)
-         print('Neutral waves mode enabled')
-      end
-      if string.find(command,'-rush') then
-         DisableTrigger(waveTrigger)
-         print('Neutral waves mode disabled')
-      end
-   end)
+   DisableTrigger(WaveTrigger)
 end
 
 function safeUnit(unit)
@@ -237,9 +226,9 @@ function unitRescueMain()
     SetUnitPathing(TELEPORTER_SINGLETON, false)
     ShowUnit(TELEPORTER_SINGLETON, false)
 
-    local safeTrigger = CreateTrigger()
-    TriggerRegisterAnyUnitEventBJ(safeTrigger, EVENT_PLAYER_UNIT_DEATH)
-    TriggerAddAction(safeTrigger, function ()
+    SafeTrigger = CreateTrigger()
+    TriggerRegisterAnyUnitEventBJ(SafeTrigger, EVENT_PLAYER_UNIT_DEATH)
+    TriggerAddAction(SafeTrigger, function ()
         local dead = GetDyingUnit()
         local killer = GetKillingUnit()
         if not IsUnitType(dead, UNIT_TYPE_SUMMONED) and
@@ -250,21 +239,7 @@ function unitRescueMain()
             safeUnit(dead)
         end
     end)
-    DisableTrigger(safeTrigger)
-
-    local controlTrigger = CreateTrigger()
-    TriggerRegisterPlayerChatEvent(controlTrigger, ADMIN_PLAYER, 'rescue', false)
-    TriggerAddAction(controlTrigger, function ()
-        local command = GetEventPlayerChatString()
-        if string.find(command, '+rescue') then
-            EnableTrigger(safeTrigger)
-            print('Unit rescue mode enabled')
-        end
-        if string.find(command, '-rescue') then
-            DisableTrigger(safeTrigger)
-            print('Unit rescue mode disabled')
-        end
-    end)
+    DisableTrigger(SafeTrigger)
 end
 
 function trainUnit(unit)
@@ -294,9 +269,9 @@ end
 
 
 function unitTrainMain()
-    local buffTrigger = CreateTrigger()
-    TriggerRegisterAnyUnitEventBJ(buffTrigger, EVENT_PLAYER_UNIT_DEATH)
-    TriggerAddAction(buffTrigger, function()
+    UnitBuffTrigger = CreateTrigger()
+    TriggerRegisterAnyUnitEventBJ(UnitBuffTrigger, EVENT_PLAYER_UNIT_DEATH)
+    TriggerAddAction(UnitBuffTrigger, function()
         local killer = GetKillingUnit()
         local dead = GetDyingUnit()
         if not IsUnitType(killer, UNIT_TYPE_HERO) and
@@ -306,21 +281,7 @@ function unitTrainMain()
             trainUnit(killer)
         end
     end)
-    DisableTrigger(buffTrigger)
-
-    local controlTrigger = CreateTrigger()
-    TriggerRegisterPlayerChatEvent(controlTrigger, ADMIN_PLAYER, 'train', false)
-    TriggerAddAction(controlTrigger, function()
-        local command = GetEventPlayerChatString()
-        if string.find(command, '+train') then
-            EnableTrigger(buffTrigger)
-            print('Training units mode enabled')
-        end
-        if string.find(command, '-train') then
-            DisableTrigger(buffTrigger)
-            print('Training units mode disabled')
-        end
-    end)
+    DisableTrigger(UnitBuffTrigger)
 end
 
 function spawnWalkingDead(unit, previousOwner)
@@ -336,9 +297,9 @@ end
 
 
 function walkingDeadMain()
-    local waveTrigger = CreateTrigger()
-    TriggerRegisterAnyUnitEventBJ(waveTrigger, EVENT_PLAYER_UNIT_DEATH)
-    TriggerAddAction(waveTrigger, function ()
+    WalkingDeadTrigger = CreateTrigger()
+    TriggerRegisterAnyUnitEventBJ(WalkingDeadTrigger, EVENT_PLAYER_UNIT_DEATH)
+    TriggerAddAction(WalkingDeadTrigger, function ()
         local unit = GetDyingUnit()
         local owner = GetOwningPlayer(unit)
         local killer = GetKillingUnit()
@@ -352,21 +313,35 @@ function walkingDeadMain()
             spawnWalkingDead(unit, owner)
         end
     end)
-    DisableTrigger(waveTrigger)
+    DisableTrigger(WalkingDeadTrigger)
+end
 
-    local controlTrigger =  CreateTrigger()
-    TriggerRegisterPlayerChatEvent(controlTrigger, ADMIN_PLAYER, 'revenge', false)
-    TriggerAddAction(controlTrigger, function()
-        local command = GetEventPlayerChatString()
-        if string.find(command, '+revenge') then
-            EnableTrigger(waveTrigger)
-            print('Walking dead mode enabled')
-        end
-        if string.find(command, '-revenge') then
-            DisableTrigger(waveTrigger)
-            print('Walking dead mode disabled')
-        end
-    end)
+function getPlayerPosition(player)
+    local structures = GetUnitsOfPlayerMatching(player, Filter(function ()
+        return IsUnitType(GetFilterUnit(), UNIT_TYPE_STRUCTURE)
+    end))
+    local target = GroupPickRandomUnit(structures)
+    return GetUnitX(target), GetUnitY(target)
+end
+
+function getRandomEnemy(player)
+    local enemies = GetPlayersEnemies(player)
+    return ForcePickRandomPlayer(enemies)
+end
+
+function rawCode2Id(rawCode)
+    local length = string.len(rawCode)
+    local i = 0
+    local mul = 1
+    local id = 0
+    local byte
+    repeat
+        byte = string.byte(rawCode, length - i)
+        id = id + byte * mul
+        i = i + 1
+        mul = mul * 256
+    until i == length
+    return id
 end
 
 function unfairWarcraftMain()
@@ -375,11 +350,13 @@ function unfairWarcraftMain()
     AI_PLAYER = Player(23)
     SetPlayerAllianceStateAllyBJ(BUFFED_PLAYER, AI_PLAYER, true)
 
-    summonArchimondeMain()
     epicDropMain()
     hellRainMain()
     neutralWaveMain()
     unitRescueMain()
     unitTrainMain()
     walkingDeadMain()
+    if GetLocalPlayer() == ADMIN_PLAYER then
+        frameMain()
+    end
 end

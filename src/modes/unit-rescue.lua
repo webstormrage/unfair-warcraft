@@ -26,9 +26,9 @@ function unitRescueMain()
     SetUnitPathing(TELEPORTER_SINGLETON, false)
     ShowUnit(TELEPORTER_SINGLETON, false)
 
-    local safeTrigger = CreateTrigger()
-    TriggerRegisterAnyUnitEventBJ(safeTrigger, EVENT_PLAYER_UNIT_DEATH)
-    TriggerAddAction(safeTrigger, function ()
+    SafeTrigger = CreateTrigger()
+    TriggerRegisterAnyUnitEventBJ(SafeTrigger, EVENT_PLAYER_UNIT_DEATH)
+    TriggerAddAction(SafeTrigger, function ()
         local dead = GetDyingUnit()
         local killer = GetKillingUnit()
         if not IsUnitType(dead, UNIT_TYPE_SUMMONED) and
@@ -39,19 +39,5 @@ function unitRescueMain()
             safeUnit(dead)
         end
     end)
-    DisableTrigger(safeTrigger)
-
-    local controlTrigger = CreateTrigger()
-    TriggerRegisterPlayerChatEvent(controlTrigger, ADMIN_PLAYER, 'rescue', false)
-    TriggerAddAction(controlTrigger, function ()
-        local command = GetEventPlayerChatString()
-        if string.find(command, '+rescue') then
-            EnableTrigger(safeTrigger)
-            print('Unit rescue mode enabled')
-        end
-        if string.find(command, '-rescue') then
-            DisableTrigger(safeTrigger)
-            print('Unit rescue mode disabled')
-        end
-    end)
+    DisableTrigger(SafeTrigger)
 end

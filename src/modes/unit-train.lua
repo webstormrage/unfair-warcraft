@@ -25,9 +25,9 @@ end
 
 
 function unitTrainMain()
-    local buffTrigger = CreateTrigger()
-    TriggerRegisterAnyUnitEventBJ(buffTrigger, EVENT_PLAYER_UNIT_DEATH)
-    TriggerAddAction(buffTrigger, function()
+    UnitBuffTrigger = CreateTrigger()
+    TriggerRegisterAnyUnitEventBJ(UnitBuffTrigger, EVENT_PLAYER_UNIT_DEATH)
+    TriggerAddAction(UnitBuffTrigger, function()
         local killer = GetKillingUnit()
         local dead = GetDyingUnit()
         if not IsUnitType(killer, UNIT_TYPE_HERO) and
@@ -37,19 +37,5 @@ function unitTrainMain()
             trainUnit(killer)
         end
     end)
-    DisableTrigger(buffTrigger)
-
-    local controlTrigger = CreateTrigger()
-    TriggerRegisterPlayerChatEvent(controlTrigger, ADMIN_PLAYER, 'train', false)
-    TriggerAddAction(controlTrigger, function()
-        local command = GetEventPlayerChatString()
-        if string.find(command, '+train') then
-            EnableTrigger(buffTrigger)
-            print('Training units mode enabled')
-        end
-        if string.find(command, '-train') then
-            DisableTrigger(buffTrigger)
-            print('Training units mode disabled')
-        end
-    end)
+    DisableTrigger(UnitBuffTrigger)
 end

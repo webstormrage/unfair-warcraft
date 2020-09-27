@@ -38,9 +38,9 @@ function createEpicDrop(x, y)
 end
 
 function epicDropMain()
-    local dropTrigger = CreateTrigger()
-    TriggerRegisterAnyUnitEventBJ(dropTrigger, EVENT_PLAYER_UNIT_DEATH)
-    TriggerAddAction(dropTrigger, function ()
+    DropTrigger = CreateTrigger()
+    TriggerRegisterAnyUnitEventBJ(DropTrigger, EVENT_PLAYER_UNIT_DEATH)
+    TriggerAddAction(DropTrigger, function ()
         local dead = GetDyingUnit()
         local killer = GetKillingUnit()
         if GetOwningPlayer(dead) == Player(PLAYER_NEUTRAL_AGGRESSIVE) and
@@ -48,19 +48,5 @@ function epicDropMain()
            createEpicDrop(GetUnitX(dead), GetUnitY(dead))
         end
     end)
-    DisableTrigger(dropTrigger)
-
-    local controlTrigger = CreateTrigger()
-    TriggerRegisterPlayerChatEvent(controlTrigger, ADMIN_PLAYER, 'drop', false)
-    TriggerAddAction(controlTrigger, function ()
-        local command = GetEventPlayerChatString()
-        if string.find(command,'+drop') then
-            EnableTrigger(dropTrigger)
-            print('Epic drop mode enabled')
-        end
-        if string.find(command,'-drop') then
-            DisableTrigger(dropTrigger)
-            print('Epic drop mode disabled')
-        end
-    end)
+    DisableTrigger(DropTrigger)
 end

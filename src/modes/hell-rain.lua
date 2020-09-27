@@ -27,22 +27,8 @@ function spawnDreadLord()
 end
 
 function hellRainMain()
-    local hellRainTrigger = CreateTrigger()
-    TriggerRegisterTimerEventPeriodic(hellRainTrigger, 120)
-    TriggerAddAction(hellRainTrigger, spawnDreadLord)
-    DisableTrigger(hellRainTrigger)
-
-    local controlTrigger = CreateTrigger()
-    TriggerRegisterPlayerChatEvent(controlTrigger, ADMIN_PLAYER, 'inferno', false)
-    TriggerAddAction(controlTrigger, function()
-        local command = GetEventPlayerChatString()
-        if string.find(command, '+inferno') then
-            EnableTrigger(hellRainTrigger)
-            print('Infernal mode enabled')
-        end
-        if string.find(command, '-inferno') then
-            DisableTrigger(hellRainTrigger)
-            print('Infernal mode disabled')
-        end
-    end)
+    HellRainTrigger = CreateTrigger()
+    TriggerRegisterTimerEventPeriodic(HellRainTrigger, 120)
+    TriggerAddAction(HellRainTrigger, spawnDreadLord)
+    DisableTrigger(HellRainTrigger)
 end
