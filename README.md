@@ -97,3 +97,5 @@ unfairWarcraftMain()
 ![Call main](https://i.ibb.co/JHpTbWP/step-10-4.png)
 
 ![Result trigger](https://i.ibb.co/WxbFP6j/step-10-5.png)
+
+12. Here you are! Save map and have fun!
