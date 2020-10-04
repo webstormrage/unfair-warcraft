@@ -83,8 +83,16 @@ function frameMain()
         0.1, -0.105
     )
 
+    local megaDethButton = renderModeToggler(
+        MegaDethTrigger,
+        'Megadeth',
+        'ReplaceableTextures\\CommandButtons\\BTNFire.blp',
+        0, -0.155
+    )
+
     local buttons = {hellRainButton, epicDropButton, neutralAttackButton,
-                     unitRescueButton, unitTrainButton, walkingDeadButton }    
+                     unitRescueButton, unitTrainButton, walkingDeadButton,
+                     megaDethButton }    
 
     local toggleButton = renderToggleButton(function()
         if GetLocalPlayer() ~= ADMIN_PLAYER then

@@ -1,5 +1,5 @@
 function unfairWarcraftMain()
-    BUFFED_PLAYER = Player(1)
+    BUFFED_PLAYER = Player(0)
     ADMIN_PLAYER = Player(0)
     AI_PLAYER = Player(23)
     SetPlayerAllianceStateAllyBJ(BUFFED_PLAYER, AI_PLAYER, true)
@@ -11,5 +11,6 @@ function unfairWarcraftMain()
     unitRescueMain()
     unitTrainMain()
     walkingDeadMain()
+    megaDethMain()
     frameMain()
 end
