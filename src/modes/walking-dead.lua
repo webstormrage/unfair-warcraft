@@ -20,6 +20,7 @@ function walkingDeadMain()
         if owner ~= AI_PLAYER and
            owner ~= Player(PLAYER_NEUTRAL_AGGRESSIVE) and
            owner ~= BUFFED_PLAYER and
+           owner ~= Player(PLAYER_NEUTRAL_PASSIVE) and
            GetOwningPlayer(killer) == BUFFED_PLAYER and
            not IsUnitType(unit, UNIT_TYPE_STRUCTURE) and
            not IsUnitType(unit, UNIT_TYPE_SUMMONED) and
