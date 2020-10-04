@@ -54,7 +54,8 @@ Each mode icon enables/disables the corrisponding mode.
 
 ![Lua select](https://i.ibb.co/C0MQTDv/step-3.png)
 
-![Lua apply](https://i.ibb.co/1Jjq5qB/step-3-2.png)
+  You also probably want to use latest balance patch on your map, so switch GameDataSet select for it. 
+ ![Latest balance](https://i.ibb.co/82Ty765/step-3-2b.png)
 
 4. Go To Scenario->Player Properties
 
