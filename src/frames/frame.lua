@@ -28,12 +28,20 @@ function renderModeToggler(trigger, name, iconSrc, x, y)
     local controlTrigger = CreateTrigger()
     
     TriggerAddAction(controlTrigger, function()
-        if IsTriggerEnabled(trigger) then
+        if type(trigger) == 'function' then 
+            if trigger() then
+                print(name..' mode enabled')
+            else
+                print(name..' mode disabled')
+            end
+        else
+          if IsTriggerEnabled(trigger) then
             DisableTrigger(trigger)
             print(name..' mode disabled')
-        else
+          else
             EnableTrigger(trigger)
             print(name..' mode enabled')
+          end
         end
     end)
     
@@ -90,9 +98,16 @@ function frameMain()
         0, -0.155
     )
 
+    local dragonButton = renderModeToggler(
+        DragonTriggerToggle,
+        'Death wings',
+        'ReplaceableTextures\\CommandButtons\\BTNBlackDragon.blp',
+        0.1, -0.155
+    )
+
     local buttons = {hellRainButton, epicDropButton, neutralAttackButton,
                      unitRescueButton, unitTrainButton, walkingDeadButton,
-                     megaDethButton }    
+                     megaDethButton, dragonButton }    
 
     local toggleButton = renderToggleButton(function()
         if GetLocalPlayer() ~= ADMIN_PLAYER then
