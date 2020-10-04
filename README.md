@@ -35,6 +35,11 @@ If Buffed Player kills enemies unit, it's copy spawns on that place and attack m
 
 ![Walking dead](https://i.ibb.co/1vBwT3q/animated-dead.png)
 
+### Megadeth
+Every 5 minutes Buffed player can cast Megadeth rain at any point on the map for 50 gold from magic circle in a center of playmap area.
+
+![Megadeth](https://i.ibb.co/sHn6yGH/megadeth.png)
+
 ## Modes activation
 Modes are switched off by default. Admin Player (default player 1) can control special UI. It could be opened/closed by toggle button
 
@@ -42,7 +47,7 @@ Modes are switched off by default. Admin Player (default player 1) can control s
 
 Each mode icon enables/disables the corrisponding mode.
 
-![Modes menu](https://i.ibb.co/SNM2RS4/toggler-on.png)
+![Modes menu](https://i.ibb.co/j8P0Yth/toggler-on.png)
 
 ## Setup
 1. Open Map to Modify in Warcraft 3 Editor
